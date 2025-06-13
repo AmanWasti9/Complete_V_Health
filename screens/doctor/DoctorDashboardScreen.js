@@ -259,14 +259,12 @@ export default function DoctorDashboardScreen({ navigation }) {
 
   return (
     <LinearGradient
-      // two‑colour gradient
-      colors={["#691d9b", "#2856b8"]} // you can replace with hex codes like '#8b5cf6', '#3b82f6'
-      // direction:  (0,0) = top‑left  →  (1,1) = bottom‑right
+      colors={["#691d9b", "#2856b8"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      {" "}
+      <Text> </Text>
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeText}>Welcome, </Text>
