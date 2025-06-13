@@ -204,15 +204,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+    textAlign: "center",
   },
   forgotPasswordLink: {
-    marginTop: 20,
-    textAlign:'center'
+    marginVertical: 10,
+    textAlign: "center",
   },
   forgotPasswordText: {
     color: "white",
     fontSize: 14,
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
+    textAlign: "center",
   },
   linkButton: {
     padding: 10,

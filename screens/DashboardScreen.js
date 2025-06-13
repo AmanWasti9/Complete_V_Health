@@ -19,8 +19,7 @@ import Slider from "@react-native-community/slider";
 import { useAuth } from "../services/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 import supabase from "../services/supabaseService";
-import { useRoute } from '@react-navigation/native';
-
+import { useRoute } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -39,23 +38,21 @@ export default function DashboardScreen({ navigation }) {
   const [nearbyHospitals, setNearbyHospitals] = useState([]);
   const [isLoadingHospitals, setIsLoadingHospitals] = useState(false);
   // const mapRef = useRef(null);
-const route = useRoute();
+  const route = useRoute();
 
   useEffect(() => {
     if (!user && !loading) {
       navigation.replace("Onboarding");
     }
   }, [user, loading, navigation]);
-useEffect(() => {
-  if (route.params?.updatedName) {
-    setUserProfile((prev) => ({
-      ...prev,
-      full_name: route.params.updatedName,
-    }));
-  }
-}, [route.params?.updatedName]);
-
-
+  useEffect(() => {
+    if (route.params?.updatedName) {
+      setUserProfile((prev) => ({
+        ...prev,
+        full_name: route.params.updatedName,
+      }));
+    }
+  }, [route.params?.updatedName]);
 
   // Get user's current location and find nearby hospitals
   // useEffect(() => {
@@ -177,8 +174,6 @@ useEffect(() => {
   //   }, 1000);
   // };
 
-
-
   //   // Add a useEffect to handle auth state changes
   // useEffect(() => {
   //   const {
@@ -244,7 +239,16 @@ useEffect(() => {
     : "User";
 
   return (
-    <View style={styles.container}>
+    // <View style={styles.container}>
+
+    <LinearGradient
+      // two‑colour gradient
+      colors={["#691d9b", "#2856b8"]} // you can replace with hex codes like '#8b5cf6', '#3b82f6'
+      // direction:  (0,0) = top‑left  →  (1,1) = bottom‑right
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
       {/* Modern flat header design */}
       <View style={styles.headerContainer}>
         <View style={styles.headerContent}>
@@ -255,11 +259,11 @@ useEffect(() => {
               </Text>
             </View>
             <View style={styles.greetingContainer}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text style={styles.greetingText}>Welcome back</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.editButton}
-                  onPress={() => navigation.navigate('ProfileEdit')}
+                  onPress={() => navigation.navigate("ProfileEdit")}
                 >
                   <Feather name="edit-2" size={16} color="#4A90E2" />
                 </TouchableOpacity>
@@ -290,8 +294,6 @@ useEffect(() => {
           </TouchableOpacity>
         </View>
       </View>
-
- 
 
       <ScrollView
         style={styles.scrollContainer}
@@ -391,9 +393,7 @@ useEffect(() => {
       >
         <Ionicons name="chatbubbles" size={28} color="#fff" />
       </TouchableOpacity>
-
-      
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -523,12 +523,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#1E293B",
+    color: "#fff",
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: "#64748B",
+    color: "#fff",
     marginBottom: 20,
   },
   servicesGrid: {
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#4F46E5", // Same purple color as the original AI Chat button
+    backgroundColor: "#691d9b", // Same purple color as the original AI Chat button
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",

@@ -279,6 +279,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+
+  forgotPasswordLink: {
+    marginVertical: 10,
+    textAlign: "center",
+  },
+  forgotPasswordText: {
+    color: "black",
+    fontSize: 14,
+    textDecorationLine: "underline",
+    textAlign: "center",
+  },
   buttonDisabled: {
     opacity: 0.6,
   },

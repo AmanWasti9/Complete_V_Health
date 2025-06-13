@@ -15,6 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../services/AuthContext";
 import supabase from "../../services/supabaseService";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function DoctorDashboardScreen({ navigation }) {
   const { user, userProfile, signOut, setUserProfile } = useAuth();
@@ -23,7 +24,6 @@ export default function DoctorDashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [todayAppointments, setTodayAppointments] = useState(0);
-  
 
   // Specialty states
   const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
@@ -100,11 +100,9 @@ export default function DoctorDashboardScreen({ navigation }) {
 
           return {
             id: patientId,
-            name: profile?.full_name || "Unknown Patient",
-            reason: patientAppointments[0]?.reason || "NA",
-            lastVisit:
-              patientAppointments[0]?.appointment_date.toString() ||
-              "No appointments found",
+            name: profile?.full_name,
+            reason: patientAppointments[0]?.reason,
+            lastVisit: patientAppointments[0]?.appointment_date.toString(),
           };
         });
 
@@ -185,13 +183,13 @@ export default function DoctorDashboardScreen({ navigation }) {
         )}
       </View>
       <View style={styles.patientInfo}>
-        <Text style={styles.patientName}>{item.name}</Text>
-        <Text style={styles.patientDetails}>Reason: {item.reason}</Text>
+        <Text style={styles.patientName}>{item.name || "User"}</Text>
+        <Text style={styles.patientDetails}>Reason: {item.reason || "NA"}</Text>
         <Text style={styles.patientCondition}>{item.condition}</Text>
         <View style={styles.appointmentInfo}>
           <Ionicons name="calendar-outline" size={14} color="#666" />
           <Text style={styles.appointmentText}>
-            Appointment: {item.lastVisit}
+            Appointment: {item.lastVisit || "No appointments found"}
           </Text>
         </View>
       </View>
@@ -220,7 +218,6 @@ export default function DoctorDashboardScreen({ navigation }) {
     }
   };
 
-
   const handleSpecialtyUpdate = async () => {
     if (!specialty.trim()) {
       setSpecialtyError("Please enter your specialty");
@@ -247,7 +244,7 @@ export default function DoctorDashboardScreen({ navigation }) {
         specialty: specialty.trim(),
         updated_at: new Date().toISOString(),
       };
-      
+
       // Update the local state
       setUserProfile(updatedProfile);
 
@@ -261,7 +258,15 @@ export default function DoctorDashboardScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      // two‑colour gradient
+      colors={["#691d9b", "#2856b8"]} // you can replace with hex codes like '#8b5cf6', '#3b82f6'
+      // direction:  (0,0) = top‑left  →  (1,1) = bottom‑right
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      {" "}
       <View style={styles.header}>
         <View>
           <Text style={styles.welcomeText}>Welcome, </Text>
@@ -269,13 +274,15 @@ export default function DoctorDashboardScreen({ navigation }) {
             Dr. {userProfile?.full_name || "Doctor"}
           </Text>
           <Text style={styles.subtitle}>Your Patients Dashboard</Text>
-          
+
           {/* Specialty Display/Add Button */}
           <View style={styles.specialtyContainer}>
             {userProfile?.specialty ? (
               <View style={styles.specialtyDisplay}>
-                <Ionicons name="medical" size={16} color="#4F46E5" />
-                <Text style={styles.specialtyText}>{userProfile.specialty}</Text>
+                <Ionicons name="medical" size={16} color="#fff" />
+                <Text style={styles.specialtyText}>
+                  {userProfile.specialty}
+                </Text>
                 <TouchableOpacity
                   onPress={() => {
                     setSpecialty(userProfile.specialty);
@@ -283,7 +290,7 @@ export default function DoctorDashboardScreen({ navigation }) {
                   }}
                   style={styles.editSpecialtyButton}
                 >
-                  <Ionicons name="pencil" size={14} color="#4F46E5" />
+                  <Ionicons name="pencil" size={14} color="#fff" />
                 </TouchableOpacity>
               </View>
             ) : (
@@ -298,7 +305,6 @@ export default function DoctorDashboardScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.headerButtons}>
-      
           <TouchableOpacity
             style={styles.signOutButton}
             onPress={async () => {
@@ -314,7 +320,6 @@ export default function DoctorDashboardScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-
       <View style={styles.actionButtonsContainer}>
         <TouchableOpacity
           style={styles.actionButton}
@@ -331,7 +336,6 @@ export default function DoctorDashboardScreen({ navigation }) {
           <Text style={styles.actionButtonText}>Availability</Text>
         </TouchableOpacity>
       </View>
-
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{patients.length}</Text>
@@ -342,7 +346,6 @@ export default function DoctorDashboardScreen({ navigation }) {
           <Text style={styles.statLabel}>Total Messages</Text>
         </View>
       </View>
-
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
@@ -363,7 +366,6 @@ export default function DoctorDashboardScreen({ navigation }) {
           </TouchableOpacity>
         </ScrollView>
       </View>
-
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#2196F3" />
@@ -386,9 +388,6 @@ export default function DoctorDashboardScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
         />
       )}
-
-  
-
       {/* Specialty Modal */}
       <Modal
         visible={showSpecialtyModal}
@@ -438,7 +437,9 @@ export default function DoctorDashboardScreen({ navigation }) {
                   <>
                     <Ionicons name="save" size={20} color="#fff" />
                     <Text style={styles.updateButtonText}>
-                      {userProfile?.specialty ? "Update Specialty" : "Add Specialty"}
+                      {userProfile?.specialty
+                        ? "Update Specialty"
+                        : "Add Specialty"}
                     </Text>
                   </>
                 )}
@@ -447,7 +448,7 @@ export default function DoctorDashboardScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </LinearGradient>
   );
 }
 
@@ -467,11 +468,11 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
+    color: "#fff",
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "#fff",
     marginTop: 4,
   },
   actionButtonsContainer: {
@@ -768,7 +769,7 @@ const styles = StyleSheet.create({
   specialtyDisplay: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(79, 70, 229, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -776,7 +777,7 @@ const styles = StyleSheet.create({
   },
   specialtyText: {
     fontSize: 14,
-    color: "#4F46E5",
+    color: "#fff",
     fontWeight: "500",
     marginLeft: 6,
     marginRight: 4,
@@ -787,7 +788,7 @@ const styles = StyleSheet.create({
   addSpecialtyButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4F46E5",
+    backgroundColor: "#fff",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -795,7 +796,7 @@ const styles = StyleSheet.create({
   },
   addSpecialtyText: {
     fontSize: 14,
-    color: "#fff",
+    color: "black",
     fontWeight: "500",
     marginLeft: 6,
   },
