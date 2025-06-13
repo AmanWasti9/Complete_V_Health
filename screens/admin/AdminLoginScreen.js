@@ -119,6 +119,7 @@ export default function AdminLoginScreen({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Enter admin email"
+              placeholderTextColor="#9ca3af"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -133,6 +134,7 @@ export default function AdminLoginScreen({ navigation }) {
               <TextInput
                 style={[styles.input, styles.passwordInput]}
                 placeholder="Enter password"
+                placeholderTextColor="#9ca3af"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
