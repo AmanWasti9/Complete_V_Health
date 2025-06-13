@@ -1,0 +1,8 @@
+{
+    "name": "stream-token",
+    "version": "1.0.0",
+    "dependencies": {
+        "@stream-io/video-react-native-sdk": "^1.16.1",
+        "stream-token": "file:"
+    }
+}
