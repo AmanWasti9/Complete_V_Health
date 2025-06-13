@@ -1,11 +1,10 @@
 {
   "expo": {
-    "name": "testing",
-    "slug": "testing",
+    "name": "Virtual Health",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "plugins": [
       "expo-dev-client",
@@ -15,27 +14,32 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#691d9b"
     },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs camera access for video calls",
         "NSMicrophoneUsageDescription": "This app needs microphone access for video calls"
-      }
+      },
+      "bitcode": false
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#691d9b"
       },
-      "package": "com.vortex105.testing",
+      "package": "com.amanullah_9.virtualhealth",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.ACCESS_NETWORK_STATE",
-        "android.permission.CHANGE_NETWORK_STATE"
+        "android.permission.CHANGE_NETWORK_STATE",
+        "android.permission.INTERNET",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WAKE_LOCK",
+        "android.permission.BLUETOOTH"
       ]
     },
     "web": {
@@ -43,7 +47,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "332ed35d-b1c3-4402-b6c2-e1a24e36afd3"
+        "projectId": "7c46231b-9bdf-4e8f-a161-9d17674b7b61"
       }
     }
   }
