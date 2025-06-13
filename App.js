@@ -25,6 +25,8 @@ import LabTestScreen from './screens/LabTestScreen';
 import PharmacyScreen from './screens/PharmacyScreen';
 import HireMedicalStaffScreen from './screens/HireMedicalStaffScreen';
 import AIChatScreen from './screens/AIChatScreen';
+import ProfileEditScreen from './screens/ProfileEditScreen';
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 
 // Doctor Screens
 import DoctorDashboardScreen from './screens/doctor/DoctorDashboardScreen';
@@ -139,6 +141,22 @@ function AppContent() {
             component={PatientChatScreen}
           />
           <Stack.Screen name="AIChat" component={AIChatScreen} />
+          <Stack.Screen 
+            name="ProfileEdit" 
+            component={ProfileEditScreen} 
+            options={{
+              headerShown: false,
+              animation: 'slide_from_right',
+            }}
+          />
+          <Stack.Screen 
+            name="ForgotPassword" 
+            component={ForgotPasswordScreen} 
+            options={{
+              headerShown: false,
+              animation: 'slide_from_right',
+            }}
+          />
         </Stack.Group>
 
         {/* Doctor Screens */}

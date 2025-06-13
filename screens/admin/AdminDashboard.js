@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+"use client"
+
+import { useState, useEffect } from "react"
 import {
   StyleSheet,
   View,
@@ -12,15 +14,15 @@ import {
   Alert,
   ScrollView,
   Image,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "../../services/AuthContext";
-import supabase from "../../services/supabaseService";
-import * as ImagePicker from "expo-image-picker";
+} from "react-native"
+import { Ionicons } from "@expo/vector-icons"
+import { useAuth } from "../../services/AuthContext"
+import supabase from "../../services/supabaseService"
+import * as ImagePicker from "expo-image-picker"
 
 export default function AdminDashboard({ navigation }) {
-  const { signOut, user, fetchUserProfile } = useAuth();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const { signOut } = useAuth()
+  const [activeTab, setActiveTab] = useState("dashboard")
   // Medical Staff state variables
   const [staffFormData, setStaffFormData] = useState({
     full_name: "",
@@ -31,140 +33,120 @@ export default function AdminDashboard({ navigation }) {
     perhourcost: "",
     experience: "",
     contact_info: "",
-  });
-  const [staffImage, setStaffImage] = useState(null);
-  const [addingStaff, setAddingStaff] = useState(false);
-  const [medicalStaff, setMedicalStaff] = useState([]);
-  const [loadingStaff, setLoadingStaff] = useState(false);
-  const [staffError, setStaffError] = useState(null);
-  const [showEditStaffModal, setShowEditStaffModal] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState(null);
-  const [staffSearchQuery, setStaffSearchQuery] = useState("");
-  const [filteredStaff, setFilteredStaff] = useState([]);
-  const [medicines, setMedicines] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedMedicine, setSelectedMedicine] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredMedicines, setFilteredMedicines] = useState([]);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState(null);
+  })
+  const [staffImage, setStaffImage] = useState(null)
+  const [addingStaff, setAddingStaff] = useState(false)
+  const [medicalStaff, setMedicalStaff] = useState([])
+  const [loadingStaff, setLoadingStaff] = useState(false)
+  const [staffError, setStaffError] = useState(null)
+  const [showEditStaffModal, setShowEditStaffModal] = useState(false)
+  const [selectedStaff, setSelectedStaff] = useState(null)
+  const [staffSearchQuery, setStaffSearchQuery] = useState("")
+  const [filteredStaff, setFilteredStaff] = useState([])
+  const [medicines, setMedicines] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedMedicine, setSelectedMedicine] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredMedicines, setFilteredMedicines] = useState([])
 
   // Fetch medicines and medical staff from Supabase
   useEffect(() => {
-    fetchMedicines();
-    fetchMedicalStaff();
-  }, []);
+    fetchMedicines()
+    fetchMedicalStaff()
+  }, [])
 
   // Filter medicines based on search query
   useEffect(() => {
     if (medicines.length > 0) {
       const filtered = medicines.filter(
         (medicine) =>
-          medicine.medicine_name
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          medicine.category?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredMedicines(filtered);
+          medicine.medicine_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          medicine.category?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      setFilteredMedicines(filtered)
     }
-  }, [medicines, searchQuery]);
+  }, [medicines, searchQuery])
 
   // Filter medical staff based on search query
   useEffect(() => {
     if (medicalStaff.length > 0) {
       const filtered = medicalStaff.filter(
         (staff) =>
-          staff.full_name
-            ?.toLowerCase()
-            .includes(staffSearchQuery.toLowerCase()) ||
+          staff.full_name?.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
           staff.role?.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
-          staff.department
-            ?.toLowerCase()
-            .includes(staffSearchQuery.toLowerCase())
-      );
-      setFilteredStaff(filtered);
+          staff.department?.toLowerCase().includes(staffSearchQuery.toLowerCase()),
+      )
+      setFilteredStaff(filtered)
     }
-  }, [medicalStaff, staffSearchQuery]);
+  }, [medicalStaff, staffSearchQuery])
 
   const fetchMedicines = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
-      const { data, error } = await supabase
-        .from("pharmacy")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("pharmacy").select("*").order("created_at", { ascending: false })
 
       if (error) {
-        throw error;
+        throw error
       }
 
       if (data) {
-        setMedicines(data);
-        setFilteredMedicines(data);
+        setMedicines(data)
+        setFilteredMedicines(data)
       }
     } catch (error) {
-      console.error("Error fetching medicines:", error);
-      setError("Failed to load medicines. Please try again.");
+      console.error("Error fetching medicines:", error)
+      setError("Failed to load medicines. Please try again.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const fetchMedicalStaff = async () => {
     try {
-      setLoadingStaff(true);
-      setStaffError(null);
+      setLoadingStaff(true)
+      setStaffError(null)
 
-      const { data, error } = await supabase
-        .from("medical_staff")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("medical_staff").select("*").order("created_at", { ascending: false })
 
       if (error) {
-        throw error;
+        throw error
       }
 
       if (data) {
-        setMedicalStaff(data);
-        setFilteredStaff(data);
+        setMedicalStaff(data)
+        setFilteredStaff(data)
       }
     } catch (error) {
-      console.error("Error fetching medical staff:", error);
-      setStaffError("Failed to load medical staff. Please try again.");
+      console.error("Error fetching medical staff:", error)
+      setStaffError("Failed to load medical staff. Please try again.")
     } finally {
-      setLoadingStaff(false);
+      setLoadingStaff(false)
     }
-  };
+  }
 
   const handleLogout = async () => {
     try {
-      await signOut();
-      navigation.replace("Onboarding");
+      await signOut()
+      navigation.replace("Onboarding")
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout error:", error)
     }
-  };
+  }
 
   const handleEditMedicine = (medicine) => {
-    setSelectedMedicine(medicine);
-    setShowEditModal(true);
-  };
+    setSelectedMedicine(medicine)
+    setShowEditModal(true)
+  }
 
   const handleUpdateMedicine = async () => {
-    if (!selectedMedicine) return;
+    if (!selectedMedicine) return
 
     try {
-      setLoading(true);
+      setLoading(true)
 
       const { error } = await supabase
         .from("pharmacy")
@@ -176,34 +158,30 @@ export default function AdminDashboard({ navigation }) {
           category: selectedMedicine.category,
           price: selectedMedicine.price,
         })
-        .eq("id", selectedMedicine.id);
+        .eq("id", selectedMedicine.id)
 
-      if (error) throw error;
+      if (error) throw error
 
       // Update both medicines and filteredMedicines states
-      const updatedMedicines = medicines.map((med) =>
-        med.id === selectedMedicine.id ? selectedMedicine : med
-      );
-      setMedicines(updatedMedicines);
+      const updatedMedicines = medicines.map((med) => (med.id === selectedMedicine.id ? selectedMedicine : med))
+      setMedicines(updatedMedicines)
       setFilteredMedicines(
         updatedMedicines.filter(
           (medicine) =>
-            medicine.medicine_name
-              ?.toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            medicine.category?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
+            medicine.medicine_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            medicine.category?.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+      )
 
-      setShowEditModal(false);
-      Alert.alert("Success", "Medicine updated successfully");
+      setShowEditModal(false)
+      Alert.alert("Success", "Medicine updated successfully")
     } catch (error) {
-      console.error("Error updating medicine:", error);
-      Alert.alert("Error", "Failed to update medicine");
+      console.error("Error updating medicine:", error)
+      Alert.alert("Error", "Failed to update medicine")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Medical Staff functions
   const pickStaffImage = async () => {
@@ -213,23 +191,23 @@ export default function AdminDashboard({ navigation }) {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
-      });
+      })
 
       if (!result.canceled) {
-        setStaffImage(result.assets[0].uri);
+        setStaffImage(result.assets[0].uri)
       }
     } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert("Error", "Failed to pick image");
+      console.error("Error picking image:", error)
+      Alert.alert("Error", "Failed to pick image")
     }
-  };
+  }
 
   const handleStaffInputChange = (field, value) => {
     setStaffFormData((prev) => ({
       ...prev,
       [field]: value,
-    }));
-  };
+    }))
+  }
 
   const resetStaffForm = () => {
     setStaffFormData({
@@ -241,63 +219,47 @@ export default function AdminDashboard({ navigation }) {
       perhourcost: "",
       experience: "",
       contact_info: "",
-    });
-    setStaffImage(null);
-  };
+    })
+    setStaffImage(null)
+  }
 
   const validateStaffForm = () => {
-    const {
-      full_name,
-      role,
-      department,
-      perdaycost,
-      perhourcost,
-      experience,
-      contact_info,
-    } = staffFormData;
+    const { full_name, role, department, perdaycost, perhourcost, experience, contact_info } = staffFormData
 
-    if (
-      !full_name ||
-      !role ||
-      !department ||
-      !perdaycost ||
-      !perhourcost ||
-      !experience ||
-      !contact_info
-    ) {
-      Alert.alert("Validation Error", "Please fill in all required fields");
-      return false;
+    if (!full_name || !role || !department || !perdaycost || !perhourcost || !experience || !contact_info) {
+      Alert.alert("Validation Error", "Please fill in all required fields")
+      return false
     }
 
     if (!staffImage) {
-      Alert.alert("Validation Error", "Please select an image");
-      return false;
+      Alert.alert("Validation Error", "Please select an image")
+      return false
     }
 
-    return true;
-  };
+    return true
+  }
 
   const handleAddStaff = async () => {
-    if (!validateStaffForm()) return;
+    if (!validateStaffForm()) return
 
     try {
-      setAddingStaff(true);
+      setAddingStaff(true)
 
       // Upload image to Cloudinary
-      const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsabwyubl/upload";
-      const UPLOAD_PRESET = "menuuuu";
+      const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dsabwyubl/upload"
+      const UPLOAD_PRESET = "menuuuu"
 
-      const formData = new FormData();
-      const filename = staffImage.split("/").pop();
-      const match = /\.([\w\d]+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image";
+      const formData = new FormData()
+      const filename = staffImage.split("/").pop()
+      const match = /\.([\w\d]+)$/.exec(filename)
+      const type = match ? `image/${match[1]}` : "image"
 
       formData.append("file", {
         uri: staffImage,
         name: filename,
         type,
-      });
-      formData.append("upload_preset", UPLOAD_PRESET);
+      })
+      formData.append("upload_preset", UPLOAD_PRESET)
 
       const imageResponse = await fetch(CLOUDINARY_URL, {
         method: "POST",
@@ -306,12 +268,12 @@ export default function AdminDashboard({ navigation }) {
           Accept: "application/json",
           "Content-Type": "multipart/form-data",
         },
-      });
+      })
 
-      const imageData = await imageResponse.json();
+      const imageData = await imageResponse.json()
 
       if (!imageData.secure_url) {
-        throw new Error("Failed to upload image");
+        throw new Error("Failed to upload image")
       }
 
       // Insert data into Supabase
@@ -324,79 +286,66 @@ export default function AdminDashboard({ navigation }) {
           image_url: imageData.secure_url,
           created_at: new Date().toISOString(),
         },
-      ]);
+      ])
 
-      if (error) throw error;
+      if (error) throw error
 
-      Alert.alert("Success", "Medical staff added successfully");
-      resetStaffForm();
+      Alert.alert("Success", "Medical staff added successfully")
+      resetStaffForm()
     } catch (error) {
-      console.error("Error adding medical staff:", error);
-      Alert.alert("Error", "Failed to add medical staff. Please try again.");
+      console.error("Error adding medical staff:", error)
+      Alert.alert("Error", "Failed to add medical staff. Please try again.")
     } finally {
-      setAddingStaff(false);
+      setAddingStaff(false)
     }
-  };
+  }
 
   const handleDeleteMedicine = (medicineId) => {
-    Alert.alert(
-      "Confirm Delete",
-      "Are you sure you want to delete this medicine?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setLoading(true);
+    Alert.alert("Confirm Delete", "Are you sure you want to delete this medicine?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setLoading(true)
 
-              const { error } = await supabase
-                .from("pharmacy")
-                .delete()
-                .eq("id", medicineId);
+            const { error } = await supabase.from("pharmacy").delete().eq("id", medicineId)
 
-              if (error) throw error;
+            if (error) throw error
 
-              // Update both medicines and filteredMedicines states
-              const updatedMedicines = medicines.filter(
-                (med) => med.id !== medicineId
-              );
-              setMedicines(updatedMedicines);
-              setFilteredMedicines(
-                updatedMedicines.filter(
-                  (medicine) =>
-                    medicine.medicine_name
-                      ?.toLowerCase()
-                      .includes(searchQuery.toLowerCase()) ||
-                    medicine.category
-                      ?.toLowerCase()
-                      .includes(searchQuery.toLowerCase())
-                )
-              );
-              Alert.alert("Success", "Medicine deleted successfully");
-            } catch (error) {
-              console.error("Error deleting medicine:", error);
-              Alert.alert("Error", "Failed to delete medicine");
-            } finally {
-              setLoading(false);
-            }
-          },
+            // Update both medicines and filteredMedicines states
+            const updatedMedicines = medicines.filter((med) => med.id !== medicineId)
+            setMedicines(updatedMedicines)
+            setFilteredMedicines(
+              updatedMedicines.filter(
+                (medicine) =>
+                  medicine.medicine_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  medicine.category?.toLowerCase().includes(searchQuery.toLowerCase()),
+              ),
+            )
+            Alert.alert("Success", "Medicine deleted successfully")
+          } catch (error) {
+            console.error("Error deleting medicine:", error)
+            Alert.alert("Error", "Failed to delete medicine")
+          } finally {
+            setLoading(false)
+          }
         },
-      ]
-    );
-  };
+      },
+    ])
+  }
 
   const handleEditStaff = (staff) => {
-    setSelectedStaff(staff);
-    setShowEditStaffModal(true);
-  };
+    setSelectedStaff(staff)
+    setShowEditStaffModal(true)
+  }
 
   const handleUpdateStaff = async () => {
-    if (!selectedStaff) return;
+    if (!selectedStaff) return
 
     try {
-      setLoadingStaff(true);
+      setLoadingStaff(true)
 
       const { error } = await supabase
         .from("medical_staff")
@@ -410,304 +359,80 @@ export default function AdminDashboard({ navigation }) {
           experience: Number.parseInt(selectedStaff.experience),
           contact_info: selectedStaff.contact_info,
         })
-        .eq("id", selectedStaff.id);
+        .eq("id", selectedStaff.id)
 
-      if (error) throw error;
+      if (error) throw error
 
       // Update both medicalStaff and filteredStaff states
-      const updatedStaff = medicalStaff.map((staff) =>
-        staff.id === selectedStaff.id ? selectedStaff : staff
-      );
-      setMedicalStaff(updatedStaff);
+      const updatedStaff = medicalStaff.map((staff) => (staff.id === selectedStaff.id ? selectedStaff : staff))
+      setMedicalStaff(updatedStaff)
       setFilteredStaff(
         updatedStaff.filter(
           (staff) =>
-            staff.full_name
-              ?.toLowerCase()
-              .includes(staffSearchQuery.toLowerCase()) ||
-            staff.role
-              ?.toLowerCase()
-              .includes(staffSearchQuery.toLowerCase()) ||
-            staff.department
-              ?.toLowerCase()
-              .includes(staffSearchQuery.toLowerCase())
-        )
-      );
+            staff.full_name?.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
+            staff.role?.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
+            staff.department?.toLowerCase().includes(staffSearchQuery.toLowerCase()),
+        ),
+      )
 
-      setShowEditStaffModal(false);
-      Alert.alert("Success", "Medical staff updated successfully");
+      setShowEditStaffModal(false)
+      Alert.alert("Success", "Medical staff updated successfully")
     } catch (error) {
-      console.error("Error updating medical staff:", error);
-      Alert.alert("Error", "Failed to update medical staff");
+      console.error("Error updating medical staff:", error)
+      Alert.alert("Error", "Failed to update medical staff")
     } finally {
-      setLoadingStaff(false);
+      setLoadingStaff(false)
     }
-  };
+  }
 
   const handleDeleteStaff = (staffId) => {
-    Alert.alert(
-      "Confirm Delete",
-      "Are you sure you want to delete this medical staff member?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setLoadingStaff(true);
+    Alert.alert("Confirm Delete", "Are you sure you want to delete this medical staff member?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setLoadingStaff(true)
 
-              const { error } = await supabase
-                .from("medical_staff")
-                .delete()
-                .eq("id", staffId);
+            const { error } = await supabase.from("medical_staff").delete().eq("id", staffId)
 
-              if (error) throw error;
+            if (error) throw error
 
-              // Update both medicalStaff and filteredStaff states
-              const updatedStaff = medicalStaff.filter(
-                (staff) => staff.id !== staffId
-              );
-              setMedicalStaff(updatedStaff);
-              setFilteredStaff(
-                updatedStaff.filter(
-                  (staff) =>
-                    staff.full_name
-                      ?.toLowerCase()
-                      .includes(staffSearchQuery.toLowerCase()) ||
-                    staff.role
-                      ?.toLowerCase()
-                      .includes(staffSearchQuery.toLowerCase()) ||
-                    staff.department
-                      ?.toLowerCase()
-                      .includes(staffSearchQuery.toLowerCase())
-                )
-              );
-              Alert.alert("Success", "Medical staff deleted successfully");
-            } catch (error) {
-              console.error("Error deleting medical staff:", error);
-              Alert.alert("Error", "Failed to delete medical staff");
-            } finally {
-              setLoadingStaff(false);
-            }
-          },
+            // Update both medicalStaff and filteredStaff states
+            const updatedStaff = medicalStaff.filter((staff) => staff.id !== staffId)
+            setMedicalStaff(updatedStaff)
+            setFilteredStaff(
+              updatedStaff.filter(
+                (staff) =>
+                  staff.full_name?.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
+                  staff.role?.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
+                  staff.department?.toLowerCase().includes(staffSearchQuery.toLowerCase()),
+              ),
+            )
+            Alert.alert("Success", "Medical staff deleted successfully")
+          } catch (error) {
+            console.error("Error deleting medical staff:", error)
+            Alert.alert("Error", "Failed to delete medical staff")
+          } finally {
+            setLoadingStaff(false)
+          }
         },
-      ]
-    );
-  };
+      },
+    ])
+  }
 
   // Helper function to get dashboard stats
   const getDashboardStats = () => {
-    const totalMedicines = medicines.length;
-    const totalStaff = medicalStaff.length;
-    const availableStaff = medicalStaff.filter(
-      (staff) => staff.availability === "Available"
-    ).length;
-    const lowStockMedicines = medicines.filter((med) => med.stock < 10).length;
+    const totalMedicines = medicines.length
+    const totalStaff = medicalStaff.length
+    const availableStaff = medicalStaff.filter((staff) => staff.availability === "Available").length
+    const lowStockMedicines = medicines.filter((med) => med.stock < 10).length
 
-    return { totalMedicines, totalStaff, availableStaff, lowStockMedicines };
-  };
+    return { totalMedicines, totalStaff, availableStaff, lowStockMedicines }
+  }
 
-  const stats = getDashboardStats();
-
-  // const handlePasswordChange = async () => {
-  //   if (
-  //     !passwordForm.currentPassword ||
-  //     !passwordForm.newPassword ||
-  //     !passwordForm.confirmPassword
-  //   ) {
-  //     setPasswordError("Please fill in all fields");
-  //     return;
-  //   }
-
-  //   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-  //     setPasswordError("New passwords do not match");
-  //     return;
-  //   }
-
-  //   if (passwordForm.newPassword.length < 6) {
-  //     setPasswordError("Password must be at least 6 characters long");
-  //     return;
-  //   }
-
-  //   try {
-  //     setChangingPassword(true);
-  //     setPasswordError(null);
-
-  //     // First verify current password
-  //     const { error: signInError } = await supabase.auth.signInWithPassword({
-  //       email: user.email,
-  //       password: passwordForm.currentPassword,
-  //     });
-
-  //     if (signInError) {
-  //       throw new Error("Current password is incorrect");
-  //     }
-
-  //     // Update password
-  //     const { error: updateError } = await supabase.auth.updateUser({
-  //       password: passwordForm.newPassword,
-  //     });
-
-  //     if (updateError) throw updateError;
-
-  //     Alert.alert("Success", "Password updated successfully", [
-  //       {
-  //         text: "OK",
-  //         onPress: async () => {
-  //           setShowPasswordModal(false);
-  //           setPasswordForm({
-  //             currentPassword: "",
-  //             newPassword: "",
-  //             confirmPassword: "",
-  //           });
-
-  //           await signOut(); // Wait for sign out
-  //           navigation.replace("Onboarding"); // Then navigate
-  //         },
-  //       },
-  //     ]);
-  //   } catch (error) {
-  //     setPasswordError(error.message);
-  //   } finally {
-  //     setChangingPassword(false);
-  //   }
-  // };
-
-
-  // const handlePasswordChange = async () => {
-    // if (
-    //   !passwordForm.currentPassword ||
-    //   !passwordForm.newPassword ||
-    //   !passwordForm.confirmPassword
-    // ) {
-    //   setPasswordError("Please fill in all fields");
-    //   return;
-    // }
-
-    // if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    //   setPasswordError("New passwords do not match");
-    //   return;
-    // }
-
-    // if (passwordForm.newPassword.length < 6) {
-    //   setPasswordError("Password must be at least 6 characters long");
-    //   return;
-    // }
-
-  //   try {
-      // setChangingPassword(true);
-      // setPasswordError(null);
-
-      // // First verify current password
-      // const { error: signInError } = await supabase.auth.signInWithPassword({
-      //   email: user.email,
-      //   password: passwordForm.currentPassword,
-      // });
-
-      // if (signInError) {
-      //   throw new Error("Current password is incorrect");
-      // }
-
-      // // Update password
-      // const { error: updateError } = await supabase.auth.updateUser({
-      //   password: passwordForm.newPassword,
-      // });
-
-      // if (updateError) throw updateError;
-
-  //     // Show success message and sign out
-  //     Alert.alert("Success", "Password updated successfully", [
-  //       {
-  //         text: "OK",
-  //         onPress: async () => {
-  //           setShowPasswordModal(false);
-  //           setPasswordForm({
-  //             currentPassword: "",
-  //             newPassword: "",
-  //             confirmPassword: "",
-  //           });
-
-  //           try {
-  //             await signOut(); // Wait for sign out to complete
-  //             navigation.replace("Onboarding");
-  //           } catch (signOutError) {
-  //             console.error("Sign out error:", signOutError);
-  //           }
-  //         },
-  //       },
-  //     ]);
-  //   } catch (error) {
-  //     setPasswordError(error.message);
-  //   } finally {
-  //     setChangingPassword(false);
-  //   }
-  // };
-
-
-
-
-  const handlePasswordChange = async () => {
-    if (
-      !passwordForm.currentPassword ||
-      !passwordForm.newPassword ||
-      !passwordForm.confirmPassword
-    ) {
-      setPasswordError("Please fill in all fields");
-      return;
-    }
-
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("New passwords do not match");
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
-      return;
-    }
-    try {
-      setChangingPassword(true);
-      setPasswordError(null);
-
-      // First verify current password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: passwordForm.currentPassword,
-      });
-
-      if (signInError) {
-        throw new Error("Current password is incorrect");
-      }
-
-      // Update password
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: passwordForm.newPassword,
-      });
-
-      if (updateError) throw updateError;
-
-      Alert.alert("Success", "Profile updated successfully", [
-        {
-          text: "OK",
-          onPress: () => {
-            setShowPasswordModal(false);
-            setPasswordForm({
-              currentPassword: "",
-              newPassword: "",
-              confirmPassword: "",
-            });
-            // Refresh the screen data
-            fetchUserProfile();
-          },
-        },
-      ]);
-    } catch (error) {
-      setProfileError(error.message);
-    } finally {
-      setUpdatingProfile(false);
-    }
-  };
+  const stats = getDashboardStats()
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -724,10 +449,7 @@ export default function AdminDashboard({ navigation }) {
                 <Text style={styles.headerSubtitle}>Healthcare Management</Text>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={handleLogout}
-            >
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
               <Ionicons name="log-out-outline" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -740,52 +462,20 @@ export default function AdminDashboard({ navigation }) {
           style={[styles.tab, activeTab === "dashboard" && styles.activeTab]}
           onPress={() => setActiveTab("dashboard")}
         >
-          <View
-            style={[
-              styles.tabIconContainer,
-              activeTab === "dashboard" && styles.activeTabIconContainer,
-            ]}
-          >
-            <Ionicons
-              name="grid-outline"
-              size={20}
-              color={activeTab === "dashboard" ? "#fff" : "#64748b"}
-            />
+          <View style={[styles.tabIconContainer, activeTab === "dashboard" && styles.activeTabIconContainer]}>
+            <Ionicons name="grid-outline" size={20} color={activeTab === "dashboard" ? "#fff" : "#64748b"} />
           </View>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "dashboard" && styles.activeTabText,
-            ]}
-          >
-            Dashboard
-          </Text>
+          <Text style={[styles.tabText, activeTab === "dashboard" && styles.activeTabText]}>Dashboard</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.tab, activeTab === "medicines" && styles.activeTab]}
           onPress={() => setActiveTab("medicines")}
         >
-          <View
-            style={[
-              styles.tabIconContainer,
-              activeTab === "medicines" && styles.activeTabIconContainer,
-            ]}
-          >
-            <Ionicons
-              name="medical-outline"
-              size={20}
-              color={activeTab === "medicines" ? "#fff" : "#64748b"}
-            />
+          <View style={[styles.tabIconContainer, activeTab === "medicines" && styles.activeTabIconContainer]}>
+            <Ionicons name="medical-outline" size={20} color={activeTab === "medicines" ? "#fff" : "#64748b"} />
           </View>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "medicines" && styles.activeTabText,
-            ]}
-          >
-            Medicines
-          </Text>
+          <Text style={[styles.tabText, activeTab === "medicines" && styles.activeTabText]}>Medicines</Text>
           {medicines.length > 0 && (
             <View style={styles.tabBadge}>
               <Text style={styles.tabBadgeText}>{medicines.length}</Text>
@@ -797,26 +487,10 @@ export default function AdminDashboard({ navigation }) {
           style={[styles.tab, activeTab === "staff" && styles.activeTab]}
           onPress={() => setActiveTab("staff")}
         >
-          <View
-            style={[
-              styles.tabIconContainer,
-              activeTab === "staff" && styles.activeTabIconContainer,
-            ]}
-          >
-            <Ionicons
-              name="people-outline"
-              size={20}
-              color={activeTab === "staff" ? "#fff" : "#64748b"}
-            />
+          <View style={[styles.tabIconContainer, activeTab === "staff" && styles.activeTabIconContainer]}>
+            <Ionicons name="people-outline" size={20} color={activeTab === "staff" ? "#fff" : "#64748b"} />
           </View>
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "staff" && styles.activeTabText,
-            ]}
-          >
-            Staff
-          </Text>
+          <Text style={[styles.tabText, activeTab === "staff" && styles.activeTabText]}>Staff</Text>
           {medicalStaff.length > 0 && (
             <View style={styles.tabBadge}>
               <Text style={styles.tabBadgeText}>{medicalStaff.length}</Text>
@@ -831,9 +505,7 @@ export default function AdminDashboard({ navigation }) {
           {/* Welcome Section */}
           <View style={styles.welcomeSection}>
             <Text style={styles.welcomeText}>Welcome Back, Admin</Text>
-            <Text style={styles.subText}>
-              Manage your healthcare system efficiently
-            </Text>
+            <Text style={styles.subText}>Manage your healthcare system efficiently</Text>
           </View>
 
           {/* Stats Cards */}
@@ -880,115 +552,52 @@ export default function AdminDashboard({ navigation }) {
             <Text style={styles.sectionTitle}>Quick Actions</Text>
 
             <View style={styles.menuContainer}>
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => navigation.navigate("AddMedicine")}
-              >
-                <View
-                  style={[
-                    styles.menuIconContainer,
-                    { backgroundColor: "#3b82f6" },
-                  ]}
-                >
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("AddMedicine")}>
+                <View style={[styles.menuIconContainer, { backgroundColor: "#3b82f6" }]}>
                   <Ionicons name="add-circle" size={28} color="#fff" />
                 </View>
                 <View style={styles.menuTextContainer}>
                   <Text style={styles.menuTitle}>Add Medicine</Text>
-                  <Text style={styles.menuDescription}>
-                    Add new medicines to inventory
-                  </Text>
+                  <Text style={styles.menuDescription}>Add new medicines to inventory</Text>
                 </View>
                 <View style={styles.menuArrow}>
                   <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => navigation.navigate("AddMedicalStaff")}
-              >
-                <View
-                  style={[
-                    styles.menuIconContainer,
-                    { backgroundColor: "#10b981" },
-                  ]}
-                >
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("AddMedicalStaff")}>
+                <View style={[styles.menuIconContainer, { backgroundColor: "#10b981" }]}>
                   <Ionicons name="person-add" size={28} color="#fff" />
                 </View>
                 <View style={styles.menuTextContainer}>
                   <Text style={styles.menuTitle}>Add Medical Staff</Text>
-                  <Text style={styles.menuDescription}>
-                    Register new medical professionals
-                  </Text>
+                  <Text style={styles.menuDescription}>Register new medical professionals</Text>
                 </View>
                 <View style={styles.menuArrow}>
                   <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => setActiveTab("medicines")}
-              >
-                <View
-                  style={[
-                    styles.menuIconContainer,
-                    { backgroundColor: "#8b5cf6" },
-                  ]}
-                >
+              <TouchableOpacity style={styles.menuItem} onPress={() => setActiveTab("medicines")}>
+                <View style={[styles.menuIconContainer, { backgroundColor: "#8b5cf6" }]}>
                   <Ionicons name="list" size={28} color="#fff" />
                 </View>
                 <View style={styles.menuTextContainer}>
                   <Text style={styles.menuTitle}>Manage Inventory</Text>
-                  <Text style={styles.menuDescription}>
-                    View and edit medicine inventory
-                  </Text>
+                  <Text style={styles.menuDescription}>View and edit medicine inventory</Text>
                 </View>
                 <View style={styles.menuArrow}>
                   <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => setActiveTab("staff")}
-              >
-                <View
-                  style={[
-                    styles.menuIconContainer,
-                    { backgroundColor: "#f59e0b" },
-                  ]}
-                >
+              <TouchableOpacity style={styles.menuItem} onPress={() => setActiveTab("staff")}>
+                <View style={[styles.menuIconContainer, { backgroundColor: "#f59e0b" }]}>
                   <Ionicons name="settings" size={28} color="#fff" />
                 </View>
                 <View style={styles.menuTextContainer}>
                   <Text style={styles.menuTitle}>Manage Staff</Text>
-                  <Text style={styles.menuDescription}>
-                    View and edit staff information
-                  </Text>
-                </View>
-                <View style={styles.menuArrow}>
-                  <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => setShowPasswordModal(true)}
-              >
-                <View
-                  style={[
-                    styles.menuIconContainer,
-                    { backgroundColor: "#ef4444" },
-                  ]}
-                >
-                  <Ionicons name="key" size={28} color="#fff" />
-                </View>
-                <View style={styles.menuTextContainer}>
-                  <Text style={styles.menuTitle}>Change Password</Text>
-                  <Text style={styles.menuDescription}>
-                    Update your account password
-                  </Text>
+                  <Text style={styles.menuDescription}>View and edit staff information</Text>
                 </View>
                 <View style={styles.menuArrow}>
                   <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
@@ -1005,12 +614,7 @@ export default function AdminDashboard({ navigation }) {
           {/* Enhanced Search Bar */}
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
-              <Ionicons
-                name="search"
-                size={20}
-                color="#64748b"
-                style={styles.searchIcon}
-              />
+              <Ionicons name="search" size={20} color="#64748b" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search medical staff..."
@@ -1019,10 +623,7 @@ export default function AdminDashboard({ navigation }) {
                 onChangeText={setStaffSearchQuery}
               />
               {staffSearchQuery.length > 0 && (
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={() => setStaffSearchQuery("")}
-                >
+                <TouchableOpacity style={styles.clearButton} onPress={() => setStaffSearchQuery("")}>
                   <Ionicons name="close-circle" size={20} color="#64748b" />
                 </TouchableOpacity>
               )}
@@ -1033,22 +634,14 @@ export default function AdminDashboard({ navigation }) {
           <View style={styles.sectionHeader}>
             <View>
               <Text style={styles.sectionTitle}>Medical Staff</Text>
-              <Text style={styles.sectionSubtitle}>
-                {filteredStaff.length} staff members
-              </Text>
+              <Text style={styles.sectionSubtitle}>{filteredStaff.length} staff members</Text>
             </View>
             <View style={styles.headerActions}>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate("AddMedicalStaff")}
-              >
+              <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("AddMedicalStaff")}>
                 <Ionicons name="add" size={20} color="#fff" />
                 <Text style={styles.addButtonText}>Add Staff</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.refreshButton}
-                onPress={fetchMedicalStaff}
-              >
+              <TouchableOpacity style={styles.refreshButton} onPress={fetchMedicalStaff}>
                 <Ionicons name="refresh" size={20} color="#3b82f6" />
               </TouchableOpacity>
             </View>
@@ -1071,10 +664,7 @@ export default function AdminDashboard({ navigation }) {
                 <Ionicons name="alert-circle" size={48} color="#ef4444" />
               </View>
               <Text style={styles.errorText}>{staffError}</Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={fetchMedicalStaff}
-              >
+              <TouchableOpacity style={styles.retryButton} onPress={fetchMedicalStaff}>
                 <Text style={styles.retryButtonText}>Try Again</Text>
               </TouchableOpacity>
             </View>
@@ -1115,27 +705,17 @@ export default function AdminDashboard({ navigation }) {
                 <View style={styles.staffCard}>
                   <View style={styles.staffCardHeader}>
                     <Image
-                      source={{
-                        uri:
-                          item.image_url || "https://via.placeholder.com/150",
-                      }}
+                      source={{ uri: item.image_url || "https://via.placeholder.com/150" }}
                       style={styles.staffAvatar}
-                      onError={() =>
-                        console.log("Error loading image for", item.full_name)
-                      }
+                      onError={() => console.log("Error loading image for", item.full_name)}
                     />
                     <View style={styles.staffInfo}>
                       <Text style={styles.staffName}>{item.full_name}</Text>
                       <Text style={styles.staffRole}>{item.role}</Text>
-                      <Text style={styles.staffDepartment}>
-                        {item.department}
-                      </Text>
+                      <Text style={styles.staffDepartment}>{item.department}</Text>
                     </View>
                     <View style={styles.staffActions}>
-                      <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={() => handleEditStaff(item)}
-                      >
+                      <TouchableOpacity style={styles.actionButton} onPress={() => handleEditStaff(item)}>
                         <Ionicons name="pencil" size={18} color="#3b82f6" />
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -1152,10 +732,8 @@ export default function AdminDashboard({ navigation }) {
                       <View
                         style={[
                           styles.availabilityBadge,
-                          item.availability === "Available" &&
-                            styles.availableBadge,
-                          item.availability === "On Leave" &&
-                            styles.onLeaveBadge,
+                          item.availability === "Available" && styles.availableBadge,
+                          item.availability === "On Leave" && styles.onLeaveBadge,
                           item.availability === "Busy" && styles.busyBadge,
                         ]}
                       >
@@ -1164,33 +742,25 @@ export default function AdminDashboard({ navigation }) {
                             item.availability === "Available"
                               ? "checkmark-circle"
                               : item.availability === "On Leave"
-                              ? "time"
-                              : "close-circle"
+                                ? "time"
+                                : "close-circle"
                           }
                           size={12}
                           color="#fff"
                         />
-                        <Text style={styles.availabilityText}>
-                          {item.availability}
-                        </Text>
+                        <Text style={styles.availabilityText}>{item.availability}</Text>
                       </View>
-                      <Text style={styles.experienceText}>
-                        {item.experience} years experience
-                      </Text>
+                      <Text style={styles.experienceText}>{item.experience} years experience</Text>
                     </View>
 
                     <View style={styles.pricingInfo}>
                       <View style={styles.priceItem}>
                         <Text style={styles.priceLabel}>Per Day</Text>
-                        <Text style={styles.priceValue}>
-                          Rs. {Number.parseFloat(item.perdaycost).toFixed(2)}
-                        </Text>
+                        <Text style={styles.priceValue}>Rs. {Number.parseFloat(item.perdaycost).toFixed(2)}</Text>
                       </View>
                       <View style={styles.priceItem}>
                         <Text style={styles.priceLabel}>Per Hour</Text>
-                        <Text style={styles.priceValue}>
-                          Rs. {Number.parseFloat(item.perhourcost).toFixed(2)}
-                        </Text>
+                        <Text style={styles.priceValue}>Rs. {Number.parseFloat(item.perhourcost).toFixed(2)}</Text>
                       </View>
                     </View>
                   </View>
@@ -1207,12 +777,7 @@ export default function AdminDashboard({ navigation }) {
           {/* Enhanced Search Bar */}
           <View style={styles.searchContainer}>
             <View style={styles.searchInputContainer}>
-              <Ionicons
-                name="search"
-                size={20}
-                color="#64748b"
-                style={styles.searchIcon}
-              />
+              <Ionicons name="search" size={20} color="#64748b" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search medicines..."
@@ -1221,10 +786,7 @@ export default function AdminDashboard({ navigation }) {
                 onChangeText={setSearchQuery}
               />
               {searchQuery.length > 0 && (
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={() => setSearchQuery("")}
-                >
+                <TouchableOpacity style={styles.clearButton} onPress={() => setSearchQuery("")}>
                   <Ionicons name="close-circle" size={20} color="#64748b" />
                 </TouchableOpacity>
               )}
@@ -1235,14 +797,9 @@ export default function AdminDashboard({ navigation }) {
           <View style={styles.sectionHeader}>
             <View>
               <Text style={styles.sectionTitle}>Medicine Inventory</Text>
-              <Text style={styles.sectionSubtitle}>
-                {filteredMedicines.length} medicines available
-              </Text>
+              <Text style={styles.sectionSubtitle}>{filteredMedicines.length} medicines available</Text>
             </View>
-            <TouchableOpacity
-              style={styles.refreshButton}
-              onPress={fetchMedicines}
-            >
+            <TouchableOpacity style={styles.refreshButton} onPress={fetchMedicines}>
               <Ionicons name="refresh" size={20} color="#3b82f6" />
             </TouchableOpacity>
           </View>
@@ -1264,10 +821,7 @@ export default function AdminDashboard({ navigation }) {
                 <Ionicons name="alert-circle" size={48} color="#ef4444" />
               </View>
               <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity
-                style={styles.retryButton}
-                onPress={fetchMedicines}
-              >
+              <TouchableOpacity style={styles.retryButton} onPress={fetchMedicines}>
                 <Text style={styles.retryButtonText}>Try Again</Text>
               </TouchableOpacity>
             </View>
@@ -1286,10 +840,7 @@ export default function AdminDashboard({ navigation }) {
                   : "Start by adding your first medicine to the inventory"}
               </Text>
               {!searchQuery && (
-                <TouchableOpacity
-                  style={styles.emptyActionButton}
-                  onPress={() => navigation.navigate("AddMedicine")}
-                >
+                <TouchableOpacity style={styles.emptyActionButton} onPress={() => navigation.navigate("AddMedicine")}>
                   <Ionicons name="add" size={20} color="#fff" />
                   <Text style={styles.emptyActionText}>Add Medicine</Text>
                 </TouchableOpacity>
@@ -1308,34 +859,17 @@ export default function AdminDashboard({ navigation }) {
                 <View style={styles.medicineCard}>
                   <View style={styles.medicineCardHeader}>
                     <Image
-                      source={{
-                        uri:
-                          item.image_url || "https://via.placeholder.com/150",
-                      }}
+                      source={{ uri: item.image_url || "https://via.placeholder.com/150" }}
                       style={styles.medicineImage}
-                      onError={() =>
-                        console.log(
-                          "Error loading image for",
-                          item.medicine_name
-                        )
-                      }
+                      onError={() => console.log("Error loading image for", item.medicine_name)}
                     />
                     <View style={styles.medicineInfo}>
-                      <Text style={styles.medicineName}>
-                        {item.medicine_name}
-                      </Text>
-                      <Text style={styles.medicineCategory}>
-                        {item.category}
-                      </Text>
-                      <Text style={styles.medicineDosage}>
-                        Dosage: {item.dosage}
-                      </Text>
+                      <Text style={styles.medicineName}>{item.medicine_name}</Text>
+                      <Text style={styles.medicineCategory}>{item.category}</Text>
+                      <Text style={styles.medicineDosage}>Dosage: {item.dosage}</Text>
                     </View>
                     <View style={styles.medicineActions}>
-                      <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={() => handleEditMedicine(item)}
-                      >
+                      <TouchableOpacity style={styles.actionButton} onPress={() => handleEditMedicine(item)}>
                         <Ionicons name="pencil" size={18} color="#3b82f6" />
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -1349,29 +883,12 @@ export default function AdminDashboard({ navigation }) {
 
                   <View style={styles.medicineCardFooter}>
                     <View style={styles.stockInfo}>
-                      <View
-                        style={[
-                          styles.stockBadge,
-                          item.stock < 10
-                            ? styles.lowStockBadge
-                            : styles.inStockBadge,
-                        ]}
-                      >
-                        <Ionicons
-                          name={
-                            item.stock < 10 ? "warning" : "checkmark-circle"
-                          }
-                          size={12}
-                          color="#fff"
-                        />
-                        <Text style={styles.stockText}>
-                          Stock: {item.stock}
-                        </Text>
+                      <View style={[styles.stockBadge, item.stock < 10 ? styles.lowStockBadge : styles.inStockBadge]}>
+                        <Ionicons name={item.stock < 10 ? "warning" : "checkmark-circle"} size={12} color="#fff" />
+                        <Text style={styles.stockText}>Stock: {item.stock}</Text>
                       </View>
                     </View>
-                    <Text style={styles.medicinePrice}>
-                      Rs. {Number.parseFloat(item.price).toFixed(2)}
-                    </Text>
+                    <Text style={styles.medicinePrice}>Rs. {Number.parseFloat(item.price).toFixed(2)}</Text>
                   </View>
                 </View>
               )}
@@ -1386,30 +903,19 @@ export default function AdminDashboard({ navigation }) {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit Medicine</Text>
-              <TouchableOpacity
-                onPress={() => setShowEditModal(false)}
-                style={styles.modalCloseButton}
-              >
+              <TouchableOpacity onPress={() => setShowEditModal(false)} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color="#64748b" />
               </TouchableOpacity>
             </View>
 
             {selectedMedicine && (
-              <ScrollView
-                style={styles.editForm}
-                showsVerticalScrollIndicator={false}
-              >
+              <ScrollView style={styles.editForm} showsVerticalScrollIndicator={false}>
                 <View style={styles.formGroup}>
                   <Text style={styles.formLabel}>Medicine Name</Text>
                   <TextInput
                     style={styles.formInput}
                     value={selectedMedicine.medicine_name}
-                    onChangeText={(text) =>
-                      setSelectedMedicine({
-                        ...selectedMedicine,
-                        medicine_name: text,
-                      })
-                    }
+                    onChangeText={(text) => setSelectedMedicine({ ...selectedMedicine, medicine_name: text })}
                     placeholder="Enter medicine name"
                     placeholderTextColor="#94a3b8"
                   />
@@ -1420,12 +926,7 @@ export default function AdminDashboard({ navigation }) {
                   <TextInput
                     style={[styles.formInput, styles.textArea]}
                     value={selectedMedicine.description}
-                    onChangeText={(text) =>
-                      setSelectedMedicine({
-                        ...selectedMedicine,
-                        description: text,
-                      })
-                    }
+                    onChangeText={(text) => setSelectedMedicine({ ...selectedMedicine, description: text })}
                     placeholder="Enter description"
                     placeholderTextColor="#94a3b8"
                     multiline
@@ -1434,19 +935,12 @@ export default function AdminDashboard({ navigation }) {
                 </View>
 
                 <View style={styles.formRow}>
-                  <View
-                    style={[styles.formGroup, { flex: 1, marginRight: 10 }]}
-                  >
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                     <Text style={styles.formLabel}>Dosage</Text>
                     <TextInput
                       style={styles.formInput}
                       value={selectedMedicine.dosage}
-                      onChangeText={(text) =>
-                        setSelectedMedicine({
-                          ...selectedMedicine,
-                          dosage: text,
-                        })
-                      }
+                      onChangeText={(text) => setSelectedMedicine({ ...selectedMedicine, dosage: text })}
                       placeholder="Enter dosage"
                       placeholderTextColor="#94a3b8"
                     />
@@ -1457,12 +951,7 @@ export default function AdminDashboard({ navigation }) {
                     <TextInput
                       style={styles.formInput}
                       value={selectedMedicine.category}
-                      onChangeText={(text) =>
-                        setSelectedMedicine({
-                          ...selectedMedicine,
-                          category: text,
-                        })
-                      }
+                      onChangeText={(text) => setSelectedMedicine({ ...selectedMedicine, category: text })}
                       placeholder="Enter category"
                       placeholderTextColor="#94a3b8"
                     />
@@ -1470,18 +959,13 @@ export default function AdminDashboard({ navigation }) {
                 </View>
 
                 <View style={styles.formRow}>
-                  <View
-                    style={[styles.formGroup, { flex: 1, marginRight: 10 }]}
-                  >
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                     <Text style={styles.formLabel}>Stock</Text>
                     <TextInput
                       style={styles.formInput}
                       value={selectedMedicine.stock?.toString()}
                       onChangeText={(text) =>
-                        setSelectedMedicine({
-                          ...selectedMedicine,
-                          stock: Number.parseInt(text) || 0,
-                        })
+                        setSelectedMedicine({ ...selectedMedicine, stock: Number.parseInt(text) || 0 })
                       }
                       placeholder="Enter stock"
                       placeholderTextColor="#94a3b8"
@@ -1495,10 +979,7 @@ export default function AdminDashboard({ navigation }) {
                       style={styles.formInput}
                       value={selectedMedicine.price?.toString()}
                       onChangeText={(text) =>
-                        setSelectedMedicine({
-                          ...selectedMedicine,
-                          price: Number.parseFloat(text) || 0,
-                        })
+                        setSelectedMedicine({ ...selectedMedicine, price: Number.parseFloat(text) || 0 })
                       }
                       placeholder="Enter price"
                       placeholderTextColor="#94a3b8"
@@ -1507,19 +988,13 @@ export default function AdminDashboard({ navigation }) {
                   </View>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.updateButton}
-                  onPress={handleUpdateMedicine}
-                  disabled={loading}
-                >
+                <TouchableOpacity style={styles.updateButton} onPress={handleUpdateMedicine} disabled={loading}>
                   {loading ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
                     <>
                       <Ionicons name="save" size={20} color="#fff" />
-                      <Text style={styles.updateButtonText}>
-                        Update Medicine
-                      </Text>
+                      <Text style={styles.updateButtonText}>Update Medicine</Text>
                     </>
                   )}
                 </TouchableOpacity>
@@ -1530,52 +1005,36 @@ export default function AdminDashboard({ navigation }) {
       </Modal>
 
       {/* Edit Medical Staff Modal */}
-      <Modal
-        visible={showEditStaffModal}
-        animationType="slide"
-        transparent={true}
-      >
+      <Modal visible={showEditStaffModal} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit Medical Staff</Text>
-              <TouchableOpacity
-                onPress={() => setShowEditStaffModal(false)}
-                style={styles.modalCloseButton}
-              >
+              <TouchableOpacity onPress={() => setShowEditStaffModal(false)} style={styles.modalCloseButton}>
                 <Ionicons name="close" size={24} color="#64748b" />
               </TouchableOpacity>
             </View>
 
             {selectedStaff && (
-              <ScrollView
-                style={styles.editForm}
-                showsVerticalScrollIndicator={false}
-              >
+              <ScrollView style={styles.editForm} showsVerticalScrollIndicator={false}>
                 <View style={styles.formGroup}>
                   <Text style={styles.formLabel}>Full Name</Text>
                   <TextInput
                     style={styles.formInput}
                     value={selectedStaff.full_name}
-                    onChangeText={(text) =>
-                      setSelectedStaff({ ...selectedStaff, full_name: text })
-                    }
+                    onChangeText={(text) => setSelectedStaff({ ...selectedStaff, full_name: text })}
                     placeholder="Enter full name"
                     placeholderTextColor="#94a3b8"
                   />
                 </View>
 
                 <View style={styles.formRow}>
-                  <View
-                    style={[styles.formGroup, { flex: 1, marginRight: 10 }]}
-                  >
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                     <Text style={styles.formLabel}>Role</Text>
                     <TextInput
                       style={styles.formInput}
                       value={selectedStaff.role}
-                      onChangeText={(text) =>
-                        setSelectedStaff({ ...selectedStaff, role: text })
-                      }
+                      onChangeText={(text) => setSelectedStaff({ ...selectedStaff, role: text })}
                       placeholder="e.g., Doctor, Nurse"
                       placeholderTextColor="#94a3b8"
                     />
@@ -1586,9 +1045,7 @@ export default function AdminDashboard({ navigation }) {
                     <TextInput
                       style={styles.formInput}
                       value={selectedStaff.department}
-                      onChangeText={(text) =>
-                        setSelectedStaff({ ...selectedStaff, department: text })
-                      }
+                      onChangeText={(text) => setSelectedStaff({ ...selectedStaff, department: text })}
                       placeholder="e.g., Cardiology"
                       placeholderTextColor="#94a3b8"
                     />
@@ -1603,21 +1060,14 @@ export default function AdminDashboard({ navigation }) {
                         key={option}
                         style={[
                           styles.availabilityOption,
-                          selectedStaff.availability === option &&
-                            styles.selectedAvailability,
+                          selectedStaff.availability === option && styles.selectedAvailability,
                         ]}
-                        onPress={() =>
-                          setSelectedStaff({
-                            ...selectedStaff,
-                            availability: option,
-                          })
-                        }
+                        onPress={() => setSelectedStaff({ ...selectedStaff, availability: option })}
                       >
                         <Text
                           style={[
                             styles.availabilityOptionText,
-                            selectedStaff.availability === option &&
-                              styles.selectedAvailabilityText,
+                            selectedStaff.availability === option && styles.selectedAvailabilityText,
                           ]}
                         >
                           {option}
@@ -1628,16 +1078,12 @@ export default function AdminDashboard({ navigation }) {
                 </View>
 
                 <View style={styles.formRow}>
-                  <View
-                    style={[styles.formGroup, { flex: 1, marginRight: 10 }]}
-                  >
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                     <Text style={styles.formLabel}>Cost Per Day (Rs. )</Text>
                     <TextInput
                       style={styles.formInput}
                       value={selectedStaff.perdaycost?.toString()}
-                      onChangeText={(text) =>
-                        setSelectedStaff({ ...selectedStaff, perdaycost: text })
-                      }
+                      onChangeText={(text) => setSelectedStaff({ ...selectedStaff, perdaycost: text })}
                       placeholder="0.00"
                       placeholderTextColor="#94a3b8"
                       keyboardType="decimal-pad"
@@ -1649,12 +1095,7 @@ export default function AdminDashboard({ navigation }) {
                     <TextInput
                       style={styles.formInput}
                       value={selectedStaff.perhourcost?.toString()}
-                      onChangeText={(text) =>
-                        setSelectedStaff({
-                          ...selectedStaff,
-                          perhourcost: text,
-                        })
-                      }
+                      onChangeText={(text) => setSelectedStaff({ ...selectedStaff, perhourcost: text })}
                       placeholder="0.00"
                       placeholderTextColor="#94a3b8"
                       keyboardType="decimal-pad"
@@ -1663,16 +1104,12 @@ export default function AdminDashboard({ navigation }) {
                 </View>
 
                 <View style={styles.formRow}>
-                  <View
-                    style={[styles.formGroup, { flex: 1, marginRight: 10 }]}
-                  >
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 10 }]}>
                     <Text style={styles.formLabel}>Experience (years)</Text>
                     <TextInput
                       style={styles.formInput}
                       value={selectedStaff.experience?.toString()}
-                      onChangeText={(text) =>
-                        setSelectedStaff({ ...selectedStaff, experience: text })
-                      }
+                      onChangeText={(text) => setSelectedStaff({ ...selectedStaff, experience: text })}
                       placeholder="0"
                       placeholderTextColor="#94a3b8"
                       keyboardType="number-pad"
@@ -1684,23 +1121,14 @@ export default function AdminDashboard({ navigation }) {
                     <TextInput
                       style={styles.formInput}
                       value={selectedStaff.contact_info}
-                      onChangeText={(text) =>
-                        setSelectedStaff({
-                          ...selectedStaff,
-                          contact_info: text,
-                        })
-                      }
+                      onChangeText={(text) => setSelectedStaff({ ...selectedStaff, contact_info: text })}
                       placeholder="Email or Phone"
                       placeholderTextColor="#94a3b8"
                     />
                   </View>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.updateButton}
-                  onPress={handleUpdateStaff}
-                  disabled={loadingStaff}
-                >
+                <TouchableOpacity style={styles.updateButton} onPress={handleUpdateStaff} disabled={loadingStaff}>
                   {loadingStaff ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
@@ -1715,97 +1143,8 @@ export default function AdminDashboard({ navigation }) {
           </View>
         </View>
       </Modal>
-
-      {/* Password Change Modal */}
-      <Modal
-        visible={showPasswordModal}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Change Password</Text>
-              <TouchableOpacity
-                onPress={() => setShowPasswordModal(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color="#64748b" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView
-              style={styles.editForm}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Current Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={passwordForm.currentPassword}
-                  onChangeText={(text) =>
-                    setPasswordForm({ ...passwordForm, currentPassword: text })
-                  }
-                  placeholder="Enter current password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>New Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={passwordForm.newPassword}
-                  onChangeText={(text) =>
-                    setPasswordForm({ ...passwordForm, newPassword: text })
-                  }
-                  placeholder="Enter new password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Confirm New Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={passwordForm.confirmPassword}
-                  onChangeText={(text) =>
-                    setPasswordForm({ ...passwordForm, confirmPassword: text })
-                  }
-                  placeholder="Confirm new password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              {passwordError && (
-                <View style={styles.errorMessage}>
-                  <Text style={styles.errorText}>{passwordError}</Text>
-                </View>
-              )}
-
-              <TouchableOpacity
-                style={styles.updateButton}
-                onPress={handlePasswordChange}
-                disabled={changingPassword}
-              >
-                {changingPassword ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <>
-                    <Ionicons name="save" size={20} color="#fff" />
-                    <Text style={styles.updateButtonText}>Update Password</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -2522,15 +1861,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  errorMessage: {
-    backgroundColor: "#fef2f2",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: "#ef4444",
-    fontSize: 14,
-    textAlign: "center",
-  },
-});
+})

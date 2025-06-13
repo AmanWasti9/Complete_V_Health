@@ -24,15 +24,6 @@ export default function DoctorDashboardScreen({ navigation }) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [todayAppointments, setTodayAppointments] = useState(0);
   
-  // Password change states
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState(null);
 
   // Specialty states
   const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
@@ -229,56 +220,6 @@ export default function DoctorDashboardScreen({ navigation }) {
     }
   };
 
-  const handlePasswordChange = async () => {
-    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
-      setPasswordError("Please fill in all password fields");
-      return;
-    }
-
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("New passwords do not match");
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
-      return;
-    }
-
-    try {
-      setChangingPassword(true);
-      setPasswordError(null);
-
-      // Verify current password
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: passwordForm.currentPassword,
-      });
-
-      if (signInError) {
-        throw new Error("Current password is incorrect");
-      }
-
-      // Update password
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: passwordForm.newPassword,
-      });
-
-      if (updateError) throw updateError;
-
-      Alert.alert("Success", "Password updated successfully");
-      setShowPasswordModal(false);
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      setPasswordError(error.message);
-    } finally {
-      setChangingPassword(false);
-    }
-  };
 
   const handleSpecialtyUpdate = async () => {
     if (!specialty.trim()) {
@@ -357,12 +298,7 @@ export default function DoctorDashboardScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={() => setShowPasswordModal(true)}
-          >
-            <Ionicons name="settings-outline" size={20} color="#fff" />
-          </TouchableOpacity>
+      
           <TouchableOpacity
             style={styles.signOutButton}
             onPress={async () => {
@@ -451,94 +387,7 @@ export default function DoctorDashboardScreen({ navigation }) {
         />
       )}
 
-      {/* Password Change Modal */}
-      <Modal
-        visible={showPasswordModal}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Change Password</Text>
-              <TouchableOpacity
-                onPress={() => setShowPasswordModal(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color="#64748b" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView
-              style={styles.editForm}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Current Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={passwordForm.currentPassword}
-                  onChangeText={(text) =>
-                    setPasswordForm({ ...passwordForm, currentPassword: text })
-                  }
-                  placeholder="Enter current password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>New Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={passwordForm.newPassword}
-                  onChangeText={(text) =>
-                    setPasswordForm({ ...passwordForm, newPassword: text })
-                  }
-                  placeholder="Enter new password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Confirm New Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={passwordForm.confirmPassword}
-                  onChangeText={(text) =>
-                    setPasswordForm({ ...passwordForm, confirmPassword: text })
-                  }
-                  placeholder="Confirm new password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              {passwordError && (
-                <View style={styles.errorMessage}>
-                  <Text style={styles.errorText}>{passwordError}</Text>
-                </View>
-              )}
-
-              <TouchableOpacity
-                style={styles.updateButton}
-                onPress={handlePasswordChange}
-                disabled={changingPassword}
-              >
-                {changingPassword ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <>
-                    <Ionicons name="save" size={20} color="#fff" />
-                    <Text style={styles.updateButtonText}>Update Password</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+  
 
       {/* Specialty Modal */}
       <Modal

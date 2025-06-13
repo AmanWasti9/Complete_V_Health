@@ -13,12 +13,14 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 // import MapView, { Marker, Circle } from "react-native-maps";
 import Slider from "@react-native-community/slider";
 import { useAuth } from "../services/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 import supabase from "../services/supabaseService";
+import { useRoute } from '@react-navigation/native';
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,28 +33,29 @@ export default function DashboardScreen({ navigation }) {
     setUserProfile,
     fetchUserProfile,
   } = useAuth();
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    fullName: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [updatingProfile, setUpdatingProfile] = useState(false);
-  const [profileError, setProfileError] = useState(null);
-
   // Map and location state
   const [userLocation, setUserLocation] = useState(null);
   const [searchRadius, setSearchRadius] = useState(10); // Default 10km
   const [nearbyHospitals, setNearbyHospitals] = useState([]);
   const [isLoadingHospitals, setIsLoadingHospitals] = useState(false);
   // const mapRef = useRef(null);
+const route = useRoute();
 
   useEffect(() => {
     if (!user && !loading) {
       navigation.replace("Onboarding");
     }
   }, [user, loading, navigation]);
+useEffect(() => {
+  if (route.params?.updatedName) {
+    setUserProfile((prev) => ({
+      ...prev,
+      full_name: route.params.updatedName,
+    }));
+  }
+}, [route.params?.updatedName]);
+
+
 
   // Get user's current location and find nearby hospitals
   // useEffect(() => {
@@ -174,170 +177,32 @@ export default function DashboardScreen({ navigation }) {
   //   }, 1000);
   // };
 
-  // For React Navigation v6+
-  const refreshScreen = () => {
-    const state = navigation.getState();
-    const currentRoute = state.routes[state.index].name;
-    navigation.replace(currentRoute);
-  };
 
-  const handleProfileUpdate = async () => {
-    try {
-      setUpdatingProfile(true);
-      setProfileError(null);
 
-      // If password fields are filled, update password first
-      if (
-        profileForm.currentPassword ||
-        profileForm.newPassword ||
-        profileForm.confirmPassword
-      ) {
-        if (
-          !profileForm.currentPassword ||
-          !profileForm.newPassword ||
-          !profileForm.confirmPassword
-        ) {
-          setProfileError("Please fill in all password fields");
-          return;
-        }
+  //   // Add a useEffect to handle auth state changes
+  // useEffect(() => {
+  //   const {
+  //     data: { subscription },
+  //   } = supabase.auth.onAuthStateChange(async (event, session) => {
+  //     console.log("Auth state changed:", event);
 
-        if (profileForm.newPassword !== profileForm.confirmPassword) {
-          setProfileError("New passwords do not match");
-          return;
-        }
+  //     if (event === "PASSWORD_RECOVERY") {
+  //       // Handle password recovery
+  //     } else if (event === "USER_UPDATED") {
+  //       // Specifically handle password updates
+  //       await fetchUserProfile();
+  //       refreshScreen();
+  //     } else if (event === "SIGNED_OUT") {
+  //       setUserProfile(null);
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{ name: "Onboarding" }],
+  //       });
+  //     }
+  //   });
 
-        if (profileForm.newPassword.length < 6) {
-          setProfileError("Password must be at least 6 characters long");
-          return;
-        }
-
-        // Verify current password
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: user.email,
-          password: profileForm.currentPassword,
-        });
-
-        if (signInError) {
-          throw new Error("Current password is incorrect");
-        }
-
-        // Update password
-        const { error: updateError } = await supabase.auth.updateUser({
-          password: profileForm.newPassword,
-        });
-
-        if (updateError) throw updateError;
-
-        // Show success message and sign out
-        Alert.alert("Success", "Password updated successfully", [
-          {
-            text: "OK",
-            onPress: async () => {
-              try {
-                // Clear all states and modals
-                setShowProfileModal(false);
-                setProfileForm({
-                  fullName: "",
-                  currentPassword: "",
-                  newPassword: "",
-                  confirmPassword: "",
-                });
-
-                // Sign out
-                // const { error: signOutError } = await supabase.auth.signOut();
-                // if (signOutError) throw signOutError;
-
-                // // Force clear navigation stack and navigate to onboarding
-                // navigation.dispatch(
-                //   CommonActions.reset({
-                //     index: 0,
-                //     routes: [{ name: "Onboarding" }],
-                //   })
-                // );
-
-                // Alternative: If you want to refresh the current screen instead of signing out
-                 refreshScreen();
-                 await fetchUserProfile();
-              } catch (error) {
-                console.error("Sign out error:", error);
-                // If there's an error, force reload the app
-                navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: "Onboarding" }],
-                  })
-                );
-              }
-            },
-          },
-        ]);
-        return;
-      }
-
-      // Rest of your profile update logic...
-      if (!profileForm.fullName) {
-        setProfileError("Please enter your full name");
-        return;
-      }
-
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          full_name: profileForm.fullName,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id);
-
-      if (profileError) throw profileError;
-
-      const updatedProfile = {
-        ...userProfile,
-        full_name: profileForm.fullName,
-        updated_at: new Date().toISOString(),
-      };
-      setUserProfile(updatedProfile);
-
-      Alert.alert("Success", "Profile updated successfully", [
-        {
-          text: "OK",
-          onPress: () => {
-            setShowProfileModal(false);
-            setProfileForm({
-              fullName: "",
-              currentPassword: "",
-              newPassword: "",
-              confirmPassword: "",
-            });
-            fetchUserProfile();
-          },
-        },
-      ]);
-    } catch (error) {
-      console.error("Profile update error:", error);
-      setProfileError(error.message);
-    } finally {
-      setUpdatingProfile(false);
-    }
-  };
-
-  // Add a useEffect to handle auth state changes
-  useEffect(() => {
-    const unsubscribe = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
-        // Clear any remaining state
-        setUserProfile(null);
-        // Force navigation to onboarding
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Onboarding" }],
-        });
-      }
-    });
-
-    return () => {
-      unsubscribe.data.subscription.unsubscribe();
-    };
-  }, [navigation]);
+  //   return () => subscription.unsubscribe();
+  // }, [navigation]);
 
   // Add a useEffect to handle screen focus
   useEffect(() => {
@@ -390,7 +255,15 @@ export default function DashboardScreen({ navigation }) {
               </Text>
             </View>
             <View style={styles.greetingContainer}>
-              <Text style={styles.greetingText}>Welcome back</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.greetingText}>Welcome back</Text>
+                <TouchableOpacity 
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate('ProfileEdit')}
+                >
+                  <Feather name="edit-2" size={16} color="#4A90E2" />
+                </TouchableOpacity>
+              </View>
               <Text style={styles.userName}>
                 {userProfile.full_name || "User"}
               </Text>
@@ -418,18 +291,7 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.profileSettingsButton}
-        onPress={() => {
-          setProfileForm({
-            ...profileForm,
-            fullName: userProfile.full_name || "",
-          });
-          setShowProfileModal(true);
-        }}
-      >
-        <Ionicons name="settings-outline" size={20} color="#fff" />
-      </TouchableOpacity>
+ 
 
       <ScrollView
         style={styles.scrollContainer}
@@ -530,111 +392,7 @@ export default function DashboardScreen({ navigation }) {
         <Ionicons name="chatbubbles" size={28} color="#fff" />
       </TouchableOpacity>
 
-      {/* Profile Update Modal */}
-      <Modal
-        visible={showProfileModal}
-        animationType="slide"
-        transparent={true}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Update Profile</Text>
-              <TouchableOpacity
-                onPress={() => setShowProfileModal(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color="#64748b" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView
-              style={styles.editForm}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Full Name</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={profileForm.fullName}
-                  onChangeText={(text) =>
-                    setProfileForm({ ...profileForm, fullName: text })
-                  }
-                  placeholder="Enter your full name"
-                  placeholderTextColor="#94a3b8"
-                />
-              </View>
-
-              <View style={styles.formDivider}>
-                <Text style={styles.formDividerText}>Change Password</Text>
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Current Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={profileForm.currentPassword}
-                  onChangeText={(text) =>
-                    setProfileForm({ ...profileForm, currentPassword: text })
-                  }
-                  placeholder="Enter current password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>New Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={profileForm.newPassword}
-                  onChangeText={(text) =>
-                    setProfileForm({ ...profileForm, newPassword: text })
-                  }
-                  placeholder="Enter new password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.formLabel}>Confirm New Password</Text>
-                <TextInput
-                  style={styles.formInput}
-                  value={profileForm.confirmPassword}
-                  onChangeText={(text) =>
-                    setProfileForm({ ...profileForm, confirmPassword: text })
-                  }
-                  placeholder="Confirm new password"
-                  placeholderTextColor="#94a3b8"
-                  secureTextEntry
-                />
-              </View>
-
-              {profileError && (
-                <View style={styles.errorMessage}>
-                  <Text style={styles.errorText}>{profileError}</Text>
-                </View>
-              )}
-
-              <TouchableOpacity
-                style={styles.updateButton}
-                onPress={handleProfileUpdate}
-                disabled={updatingProfile}
-              >
-                {updatingProfile ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <>
-                    <Ionicons name="save" size={20} color="#fff" />
-                    <Text style={styles.updateButtonText}>Update Profile</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      
     </View>
   );
 }
@@ -1072,6 +830,18 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 10,
   },
+  modalHeaderContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  editButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -1117,14 +887,14 @@ const styles = StyleSheet.create({
     color: "#1e293b",
   },
   formDivider: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 20,
   },
   formDividerText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#64748b',
+    fontWeight: "600",
+    color: "#64748b",
     marginRight: 10,
   },
   errorMessage: {
